@@ -138,6 +138,34 @@ class Game:
             self.bg_hills = pygame.transform.scale(hills_img, (new_w, self.screen_height))
             self.bg_hills_width = new_w
 
+        # Pre-render gradient backgrounds for performance
+        self._create_gradient_surfaces()
+
+    def _create_gradient_surfaces(self):
+        """Pre-render gradient backgrounds for better performance."""
+        # Sky gradient (top to ground level)
+        self.sky_gradient = pygame.Surface((self.screen_width, self.ground_y))
+        sky_top = (135, 180, 220)
+        sky_bottom = (200, 220, 240)
+        for y in range(self.ground_y):
+            ratio = y / self.ground_y
+            r = int(sky_top[0] + (sky_bottom[0] - sky_top[0]) * ratio)
+            g = int(sky_top[1] + (sky_bottom[1] - sky_top[1]) * ratio)
+            b = int(sky_top[2] + (sky_bottom[2] - sky_top[2]) * ratio)
+            pygame.draw.line(self.sky_gradient, (r, g, b), (0, y), (self.screen_width, y))
+
+        # Ground/dirt gradient (below ground level)
+        ground_height = self.screen_height - self.ground_y
+        self.ground_gradient = pygame.Surface((self.screen_width, ground_height))
+        light_brown = (139, 90, 60)
+        dark_brown = (50, 30, 15)
+        for y in range(ground_height):
+            ratio = y / ground_height
+            r = int(light_brown[0] + (dark_brown[0] - light_brown[0]) * ratio)
+            g = int(light_brown[1] + (dark_brown[1] - light_brown[1]) * ratio)
+            b = int(light_brown[2] + (dark_brown[2] - light_brown[2]) * ratio)
+            pygame.draw.line(self.ground_gradient, (r, g, b), (0, y), (self.screen_width, y))
+
     def start_game(self):
         """Initialize/reset game for a new run."""
         self.state = self.STATE_PLAYING
@@ -161,9 +189,9 @@ class Game:
         self.stash = 0
         self.distance = 0
 
-        # Reset foreground elements
+        # Reset foreground elements - start spawning ahead of player
         self.fg_elements = []
-        self.last_fg_spawn_x = 0
+        self.last_fg_spawn_x = -200  # Start behind player so first spawns appear on screen
 
         # Rainbow particles for milestone sign
         self.rainbow_particles = []
@@ -587,27 +615,9 @@ class Game:
             self.splash_screen.draw(surface)
             return
 
-        # First, fill the entire screen with sky gradient (top to ground level)
-        sky_top = (135, 180, 220)      # Light blue at top
-        sky_bottom = (200, 220, 240)   # Lighter blue near horizon
-        for y in range(self.ground_y):
-            ratio = y / self.ground_y
-            r = int(sky_top[0] + (sky_bottom[0] - sky_top[0]) * ratio)
-            g = int(sky_top[1] + (sky_bottom[1] - sky_top[1]) * ratio)
-            b = int(sky_top[2] + (sky_bottom[2] - sky_top[2]) * ratio)
-            pygame.draw.line(surface, (r, g, b), (0, y), (self.screen_width, y))
-
-        # Draw background gradient below ground (dirt getting deeper)
-        light_brown = (139, 90, 60)   # Top of dirt (just below ground tile)
-        dark_brown = (50, 30, 15)     # Deep dirt at bottom
-
-        for y in range(self.ground_y, self.screen_height):
-            # Calculate gradient ratio (0 at ground_y, 1 at bottom)
-            ratio = (y - self.ground_y) / (self.screen_height - self.ground_y)
-            r = int(light_brown[0] + (dark_brown[0] - light_brown[0]) * ratio)
-            g = int(light_brown[1] + (dark_brown[1] - light_brown[1]) * ratio)
-            b = int(light_brown[2] + (dark_brown[2] - light_brown[2]) * ratio)
-            pygame.draw.line(surface, (r, g, b), (0, y), (self.screen_width, y))
+        # Blit pre-rendered gradient backgrounds (much faster than drawing lines each frame)
+        surface.blit(self.sky_gradient, (0, 0))
+        surface.blit(self.ground_gradient, (0, self.ground_y))
 
         # Draw background layers with parallax
         camera_x = self.camera.get_offset_x() if self.camera else 0
