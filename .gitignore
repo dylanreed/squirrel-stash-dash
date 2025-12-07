@@ -32,3 +32,12 @@ build/web-cache/
 
 # Archived files (WAV backups, build artifacts, etc.)
 archive/
+
+# Netlify local state
+.netlify/
+
+# Pygbag version file
+build/version.txt
+
+# itch.io distribution files
+stash-dash-web.zip
