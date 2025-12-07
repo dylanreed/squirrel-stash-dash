@@ -646,9 +646,8 @@ class Game:
             img_width = layer["width"]
             img_height = layer["image"].get_height()
             offset = int(camera_x * layer["speed"]) % img_width
-            # Position so tree bases sit at ground level
-            # The image has trees near the top, so we need to bring it down
-            y_pos = self.ground_y - 150  # Adjust so trees touch ground
+            # Position so bottom of scaled image aligns with ground
+            y_pos = self.ground_y - img_height
             x = -offset
             while x < self.screen_width:
                 surface.blit(layer["image"], (x, y_pos))
