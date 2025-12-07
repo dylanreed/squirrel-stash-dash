@@ -103,8 +103,12 @@ class Game:
                 img = pygame.image.load(path).convert_alpha()
                 orig_w, orig_h = img.get_size()
                 if filename == "bg_mid.png":
-                    # Use actual image size for bg_mid
-                    self.bg_layers.append({"image": img, "speed": speed, "width": orig_w})
+                    # Scale bg_mid to 5x for background presence
+                    scale_factor = 5
+                    new_w = int(orig_w * scale_factor)
+                    new_h = int(orig_h * scale_factor)
+                    img = pygame.transform.scale(img, (new_w, new_h))
+                    self.bg_layers.append({"image": img, "speed": speed, "width": new_w})
                 else:
                     # Scale other images to screen height, maintaining aspect ratio
                     scale_factor = self.screen_height / orig_h

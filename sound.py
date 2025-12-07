@@ -5,8 +5,6 @@ Handles sound effects and dynamic music tempo based on player speed.
 
 import pygame
 import os
-import array
-import wave
 
 
 class SoundManager:
