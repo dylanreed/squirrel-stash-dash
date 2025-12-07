@@ -7,7 +7,6 @@ __pycache__/
 *.egg-info/
 .eggs/
 dist/
-build/
 *.egg
 
 # Virtual environments
@@ -28,5 +27,8 @@ Thumbs.db
 # Game saves (optional - may want to keep)
 # squirrel_yarn_save.json
 
-# Pygbag build cache
+# Pygbag build cache (keep build/web for Netlify)
 build/web-cache/
+
+# Archived files (WAV backups, build artifacts, etc.)
+archive/

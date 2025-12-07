@@ -1,0 +1,1 @@
+ignore = archive, docs, .git, .netlify, __pycache__, *.md, *.zip
