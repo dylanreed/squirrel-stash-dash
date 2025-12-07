@@ -617,7 +617,7 @@ class Game:
             hills_offset = int(camera_x * 0.05) % self.bg_hills_width
             x = -hills_offset
             while x < self.screen_width:
-                surface.blit(self.bg_hills, (x, 0))
+                surface.blit(self.bg_hills, (x, -50))  # Move up 50px
                 x += self.bg_hills_width
 
         # Layer 1: Far trees (transparent sky lets hills show through)
@@ -636,8 +636,9 @@ class Game:
             img_width = layer["width"]
             img_height = layer["image"].get_height()
             offset = int(camera_x * layer["speed"]) % img_width
-            # Position so tree bases are at ground level
-            y_pos = self.ground_y - img_height
+            # Position so tree bases sit at ground level
+            # The image has trees near the top, so we need to bring it down
+            y_pos = self.ground_y - 150  # Adjust so trees touch ground
             x = -offset
             while x < self.screen_width:
                 surface.blit(layer["image"], (x, y_pos))
