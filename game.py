@@ -101,13 +101,17 @@ class Game:
             path = os.path.join("assets", "sprites", filename)
             if os.path.exists(path):
                 img = pygame.image.load(path).convert_alpha()
-                # Scale image to screen height, maintaining aspect ratio
                 orig_w, orig_h = img.get_size()
-                scale_factor = self.screen_height / orig_h
-                new_w = int(orig_w * scale_factor)
-                new_h = self.screen_height
-                img = pygame.transform.scale(img, (new_w, new_h))
-                self.bg_layers.append({"image": img, "speed": speed, "width": new_w})
+                if filename == "bg_mid.png":
+                    # Use actual image size for bg_mid
+                    self.bg_layers.append({"image": img, "speed": speed, "width": orig_w})
+                else:
+                    # Scale other images to screen height, maintaining aspect ratio
+                    scale_factor = self.screen_height / orig_h
+                    new_w = int(orig_w * scale_factor)
+                    new_h = self.screen_height
+                    img = pygame.transform.scale(img, (new_w, new_h))
+                    self.bg_layers.append({"image": img, "speed": speed, "width": new_w})
             else:
                 # Create simple colored fallback
                 surf = pygame.Surface((self.screen_width, self.screen_height))
@@ -507,8 +511,12 @@ class Game:
                 # Position Y: anchor to ground line
                 # Trees need more offset due to trunk transparency, rocks less
                 if sprite_type == "tree":
-                    # Trees have transparent padding - push down to anchor trunk to grass
-                    ground_offset = int(15 * scale)
+                    if layer == "front":
+                        # Front trees (in front of squirrel) - 40px below ground
+                        ground_offset = 40
+                    else:
+                        # Back trees (behind squirrel) - 20px below ground
+                        ground_offset = 20
                 else:
                     # Rocks sit directly on ground with minimal offset
                     ground_offset = int(5 * scale)
