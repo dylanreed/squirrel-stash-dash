@@ -1,5 +1,5 @@
 [build]
-  command = "pip install pygbag && pygbag --build ."
+  command = "pip install pygbag && python -m pygbag --build ."
   publish = "build/web"
 
 [build.environment]
